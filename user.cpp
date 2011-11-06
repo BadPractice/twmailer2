@@ -29,7 +29,6 @@ void user::do_del(int nmb)
 
 void user::send(string to, string message)
 {
-    cout<<message<<endl;
     message=name + "\n" + message;
     mkdir(to.c_str(),0700);
     ofstream handle;
@@ -46,9 +45,31 @@ void user::send(string to, string message)
     handle.close();
 }
 
+void user::send(list <string> to, string message)
+{
+	ofstream handle;
+    time_t now;
+	while(to.begin()!=to.end())
+	{
+		message=name + "\n" + message;
+		mkdir(to.front().c_str(),0700);
+		stringstream strm;
+		string convert;
+		time(&now);
+		strm << now;
+		convert=strm.str();
+		convert=to.front() +"/"+ convert;
+		cout << convert<< endl;
+		handle.open(convert.c_str(),ios::out);
+		handle<<message;
+		handle.close();
+		to.pop_front();
+	}
+}
+
+
 string user::do_list()
 {
-    cout<<"doing list"<<endl;
     string buffer;
     list<string> filenames;
      list<string>::iterator it;
@@ -56,7 +77,7 @@ string user::do_list()
     this->getfilenames(&filenames);
     filenames.sort();//user::sortnumb);
     for( it=filenames.begin() ; it != filenames.end(); it++ ){
-        buffer.append( *it=this->getfile(*it,1));
+        buffer.append( *it=getfile(*it));
         buffer.append("\n");
     }
      cout<<buffer<<endl;
@@ -65,27 +86,28 @@ string user::do_list()
 
 string user::do_read(int msg)
 {
+	string h;
     int i;
-    cout <<"aaa"<<endl;
 list<string> filenames;
      list<string>::iterator it;
   //  buffer.clear();
-    this->getfilenames(&filenames);
+    getfilenames(&filenames);
+    if(msg>filenames.size())return "error";
     filenames.sort();//user::sortnumb);
     it=filenames.begin();
     for(i=1;i<msg;i++)it++;
-    return getfile(*it,0);
+    h=getfile(*it);
+    return h;
 
 
 }
-string user::getfile(string filename,int rows)
+string user::getfile(string filename)
 {
-    int i=0;
     string back, line;
     filename = name + "/"+ filename;
     ifstream handle;
     handle.open(filename.c_str(), ios::in);
-    while (handle.good()&&(i!=rows))
+    while (handle.good())
     {
         getline (handle,line);
         back=back+line;
@@ -117,7 +139,7 @@ int user::getfilenames(list <string> *namelist){
     return i;
 }
 
-int user::writefile(string message)
+void user::writefile(string message)
 {
     ofstream handle;
     time_t now;
@@ -131,7 +153,6 @@ int user::writefile(string message)
     handle.open(convert.c_str(),ios::out);
     handle<<message;
     handle.close();
-    return 0;
 }
 
 user::~user()

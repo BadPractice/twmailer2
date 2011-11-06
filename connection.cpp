@@ -53,7 +53,6 @@ int connection::recive()
     {
         buf[size] = '\0';
         buffer.assign(buf);
-        cout<<buffer.size()<<endl;
         return EXIT_SUCCESS;
     }
     else if (size == 0)

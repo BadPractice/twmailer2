@@ -56,7 +56,6 @@ void iplist::refresh()
 }
 int iplist::check(string arg)
 {
-	cout<<"badguys empty  "<<badguys.empty()<<endl;
 	//if(badguys.empty()==0)return 0;
 	string h;
     int count=0;

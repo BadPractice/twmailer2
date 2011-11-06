@@ -23,10 +23,6 @@ void* do_client(void *xxx)
     string h;
     
     
-    cout<<"beginnin debug"<<endl;
-    myipl.add("hallo");
-   cout<<"check resulted in"<< myipl.check("hallo")<<endl;
-    
     if(mycon.recive())
     {
         cout << "Data corupted"<<endl;
@@ -52,13 +48,14 @@ void* do_client(void *xxx)
             cout<<"cant recive data"<<endl;
             return NULL;
         }
+        cout<<"recived"<<endl;
         mymsg.open(mycon.get_msg());
-        cout <<"type is " << mymsg.get_type();
         switch(mymsg.get_type())
         {
+
         case 's':
              h= mymsg.get_betreff()+ "\n"+ mymsg.get_message();
-            myusr.send(mymsg.get_reciver(),h);
+            myusr.send(mymsg.get_reciverlist(),h);
             cout<<mymsg.get_message()<<endl;
             mycon.say_ok();
             break;
@@ -74,6 +71,9 @@ void* do_client(void *xxx)
             break;
         case 'q':
 			return NULL;
+		case 'e':
+			mycon.say_err();
+			break;
         }
 
     }

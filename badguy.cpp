@@ -6,7 +6,6 @@ badguy::badguy(string arg)
 {
     //ctor
     mytime=time(NULL);
-        cout<<"time: " <<mytime<<endl;
     mytime=mytime + TIMEOUT;
     name=arg;
 }

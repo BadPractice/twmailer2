@@ -11,7 +11,8 @@ char message::open(string msg)
     string help;
     int pos;
     pos=msg.find("\n",0);
-    if(pos<1 || pos>MAX_LENGTH_COMMAND+1) return type = 'e';
+    if(pos<1 || pos>MAX_LENGTH_COMMAND+1
+				||(unsigned int)pos==string::npos) return type = 'e';
     help=msg.substr(0,pos);
     msg=msg.substr(pos+1);
     if(help.compare("send")==0)
@@ -19,17 +20,24 @@ char message::open(string msg)
         if(help.length() !=4) return type='e';
         pos=msg.find("\n",0);
         reciver=msg.substr(0,pos);
-      //  cout<<"reciver: "<<reciver<<endl;//debug message!
         msg=msg.substr(pos+1);
-        if(reciver.length() > MAX_LENGTH_ADRESS) return type='e';
+			reciverlist.clear();
+			while((pos=reciver.find(","))!=string::npos)
+			{
+				if(pos > MAX_LENGTH_ADRESS) return type='e';
+				reciverlist.push_back(reciver.substr(0,pos));
+				reciver=reciver.substr(pos+1);
+				
+			} 
+			reciverlist.push_back(reciver);
         pos=msg.find("\n",0);
         betreff=msg.substr(0,pos);
-     //   cout<<"betreff: "<<betreff<<endl;
+        cout<<"betreff: "<<betreff<<endl;
         msg=msg.substr(pos+1);
         if(reciver.length() > MAX_LENGHT_BETREFF) return type='e';
         text=msg;
-       // cout<<"message: "<<text<<endl;
-        return type= 's';
+        cout<<"message: "<<text<<endl;
+        return type='s';
     }
     if(help.compare("delete")==0)
     {
@@ -59,13 +67,18 @@ char message::open(string msg)
 
 string message::get_reciver()
 {
-    if(type!= 's')return "error";
+    if(type!= 's')return "";
     return reciver;
+}
+
+list <string> message::get_reciverlist()
+{
+    return reciverlist;
 }
 
 string message::get_betreff()
 {
-    if(type!= 's')return "";
+    if(type!= 's'&& type!= 'm')return "";
     return betreff;
 }
 
@@ -77,7 +90,7 @@ int message::get_msg_nmb()
 
 string message::get_message()
 {
-    if(type!= 's')return "error";
+    if(type!= 's'&& type!= 'm')return "";
     return text;
 }
 char message::get_type()
