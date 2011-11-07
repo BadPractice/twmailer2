@@ -7,8 +7,7 @@ login::login(string msg) {
     name=msg.substr(0,pos);
     
     passwd=msg.substr(pos+1); // \n sollen ausgelassen werden
-    pos=msg.find("\n",0);
-    passwd.erase(pos);        // weiteres \n wird gelöscht
+
 
     
     filter = "(uid="; // search-Filter zusammenstückeln
@@ -52,6 +51,12 @@ int login::proof()
 	if(rc != LDAP_SUCCESS) {
 		fprintf(stderr,"\nLDAP search error: %s\n",ldap_err2string(rc));
 		return EXIT_FAILURE;
+	}else{
+		printf("\nTotal results: %d\n", ldap_count_entries(ld, result));
+		if(ldap_count_entries(ld,result) < 1) {
+			fprintf(stderr,"\nUser nicht gefunden!\n");
+			return EXIT_FAILURE;
+		}
 	}
 	
 	e = ldap_first_entry(ld, result);
@@ -67,8 +72,6 @@ int login::proof()
 	} else {
 		printf("\nbind successful\n");
 	}
-	
-	printf("\nTotal results: %d\n", ldap_count_entries(ld, result));
 	
 	
 	/* free memory used for result */

@@ -11,36 +11,52 @@
 #include "message.h"
 #include "login.h"
 #include "iplist.h"
+#define MAX_LOGIN_TRY 3
 iplist myipl = iplist();
 void* do_client(void *xxx)
 {
     pthread_detach (pthread_self ());cout<<"thread created!"<<endl;
     
-    int pos;
-    
+    int pos,i=0;
+    login *mylog;
     message mymsg = message();
 	connection mycon =*((connection *)xxx);
     string h;
     
     
+while(1)
+{
+	myipl.debug_msg();
     if(mycon.recive())
     {
-        cout << "Data corupted"<<endl;
+        cout << "bad data"<<endl;
         return NULL;
     }
     h=mycon.get_msg();
     pos=h.find("\n",0);
     h=h.substr(0,pos);
-    myipl.check(h);
-    login mylog= login(mycon.get_msg());//login wird erstellt mit den string "name\npasswd"
-    if(mylog.proof())
+    if(myipl.check(h))
+    {
+	mycon.say_err();
+	return NULL;
+    }
+    mylog= new login(mycon.get_msg());
+    //login wird erstellt mit den string "name\npasswd"
+    if((*mylog).proof())
     {
         mycon.say_err();
-        cout<<"bad login"<<endl;
-        return NULL;
+        delete mylog;
+        i++;
+        if(i==MAX_LOGIN_TRY)
+        { 
+			myipl.add(h); 
+			return NULL;
+		}
     }
+    else break;
+}
     mycon.say_ok();
-    user myusr = user(mylog.get_name());
+    user myusr = user((*mylog).get_name());
     while(1)
     {
         if(mycon.recive())

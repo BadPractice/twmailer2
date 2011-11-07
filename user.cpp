@@ -7,8 +7,11 @@
 #include <sys/stat.h>
 #include <dirent.h>
 #include <ctime>
-
+#include <pthread.h>
 using namespace std;
+
+pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+
 
 user::user(string aaa)
 {
@@ -35,7 +38,11 @@ void user::send(string to, string message)
     time_t now;
     stringstream strm;
     string convert;
+    
+	pthread_mutex_lock(&lock);
     time(&now);
+    sleep(1);
+	pthread_mutex_unlock(&lock);
     strm << now;
     convert=strm.str();
     convert=to +"/"+ convert;
@@ -80,7 +87,6 @@ string user::do_list()
         buffer.append( *it=getfile(*it));
         buffer.append("\n");
     }
-     cout<<buffer<<endl;
     return buffer;
 }
 
